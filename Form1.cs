@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace Winforms_XML_HW
 {
@@ -19,41 +20,60 @@ namespace Winforms_XML_HW
         
         public XmlDocument xmldoc;
         public string xmlfile = "@xmlhwfile.xml";
+        public bool chk = false;
         public Form1()
         {
             InitializeComponent();
         }
-
+        XDocument xmldo;
         private void Button_Kaydet_Click(object sender, EventArgs e)
         {
-            
-            
-            xmlw = XmlWriter.Create(xmlfile);
 
-            xmlws = new XmlWriterSettings();
-            xmlws.ConformanceLevel = ConformanceLevel.Auto;
-            xmlw.WriteStartDocument();
-            //
-            xmlw.WriteStartElement("Info");
+            if (chk == false)
+            {
+                xmlw = XmlWriter.Create(xmlfile);
 
-            xmlw.WriteStartElement("İsim");
-            xmlw.WriteString(TextBox_Isim.Text);
-            xmlw.WriteEndElement();
-            
-            xmlw.WriteStartElement("Soyisim");
-            xmlw.WriteString(TextBox_Soyisim.Text);
-            xmlw.WriteEndElement();
-            xmlw.WriteEndElement();
-            
-            TextBox_Isim.Text = TextBox_Soyisim.Text = String.Empty;
+                xmlws = new XmlWriterSettings();
+                xmlws.ConformanceLevel = ConformanceLevel.Auto;
+                xmlw.WriteStartDocument();
+                //
+                xmlw.WriteStartElement("Info");
 
+                xmlw.WriteStartElement("İsim");
+                xmlw.WriteString(TextBox_Isim.Text);
+                xmlw.WriteEndElement();
+
+                xmlw.WriteStartElement("Soyisim");
+                xmlw.WriteString(TextBox_Soyisim.Text);
+                xmlw.WriteEndElement(); 
+                xmlw.WriteEndElement();
+
+                
+                xmlw.WriteEndDocument();
+                xmlw.Close();
+                chk = true;
+                EmptyTextBoxes();
+            }
+            else
+            {
+                string path = @xmlfile;
+                xmldo = new XDocument();
+                xmldo = XDocument.Load(path);
+                xmldo.Root.Add(new XElement("Info",
+                    new XElement("İsim", TextBox_Isim.Text),
+                    new XElement("Soyisim", TextBox_Soyisim.Text)
+
+                    ));
+                xmldo.Save(path);
+                EmptyTextBoxes();
+
+            }
+               
 
         }
-        private void Form1_Closing(object sender, EventArgs e)
+        public void EmptyTextBoxes()
         {
-
-            xmlw.WriteEndDocument();
-            xmlw.Close();
+            TextBox_Isim.Text = TextBox_Soyisim.Text = String.Empty;
         }
     }
 }
